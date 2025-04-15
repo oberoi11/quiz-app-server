@@ -34,21 +34,20 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
+    origin: "*",
+    methods: ["GET", "POST", "DELETE", "PATCH"],},
 });
 
 const userTabSwitches = {};
 const examLeaderboards = {};
 
 io.on("connection", (socket) => {
-  console.log("🔌 Socket connected:", socket.id);
+  console.log("Socket connected:", socket.id);
 
   socket.on("tab-switch", ({ userId, examId, count }) => {
     if (!userId || !examId) return;
 
-    console.log(`📄 User ${userId} switched tabs in Exam ${examId}. Count: ${count}`);
+    console.log(`User ${userId} switched tabs in Exam ${examId}. Count: ${count}`);
 
     if (!userTabSwitches[userId]) userTabSwitches[userId] = {};
     userTabSwitches[userId][examId] = count;
@@ -63,7 +62,7 @@ io.on("connection", (socket) => {
     }
 
     if (count >= 3) {
-      console.log(`🚨 Auto-submit triggered for User ${userId}, Exam ${examId}`);
+      console.log(`Auto-submit triggered for User ${userId}, Exam ${examId}`);
       socket.emit("force-submit");
     }
   });
@@ -71,14 +70,14 @@ io.on("connection", (socket) => {
   socket.on("exam-submitted", ({ userId, examId }) => {
     if (userTabSwitches[userId]?.[examId]) {
       userTabSwitches[userId][examId] = 0;
-      console.log(`✅ Reset tab switch count (submitted): User ${userId}, Exam ${examId}`);
+      console.log(`Reset tab switch count (submitted): User ${userId}, Exam ${examId}`);
     }
   });
 
   socket.on("exam-timer-ended", ({ userId, examId }) => {
     if (userTabSwitches[userId]?.[examId]) {
       userTabSwitches[userId][examId] = 0;
-      console.log(`⏱️ Reset tab switch count (timer ended): User ${userId}, Exam ${examId}`);
+      console.log(`Reset tab switch count (timer ended): User ${userId}, Exam ${examId}`);
     }
   });
 
@@ -124,10 +123,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("❌ Socket disconnected:", socket.id);
+    console.log("Socket disconnected:", socket.id);
   });
 });
 
 server.listen(port, () => {
-  console.log(`🚀 Server listening on port ${port}`);
+  console.log(`Server listening on port ${port}`);
 });
