@@ -3,7 +3,6 @@ const app = express();
 require("dotenv").config();
 app.use(express.json());
 const cors = require("cors");
-app.use(cors({ origin: "*" }));
 
 const dbConfig = require("./config/dbConfig");
 
@@ -14,6 +13,13 @@ const reportsRoute = require("./routes/reportsRoute");
 app.use("/api/users", usersRoute);
 app.use("/api/exams", examsRoute);
 app.use("/api/reports", reportsRoute);
+
+app.use(cors({
+  origin: "https://anshquiz.netlify.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true,
+}));
+
 
 const http = require("http");
 const { Server } = require("socket.io");
@@ -34,7 +40,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://anshquiz.netlify.app",
     methods: ["GET", "POST", "DELETE", "PATCH"],},
 });
 
